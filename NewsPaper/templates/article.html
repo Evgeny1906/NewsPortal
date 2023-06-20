@@ -1,0 +1,75 @@
+{% extends 'flatpages/default.html' %}
+
+{% load custom_filters %}
+{% load custom_tegs %}
+
+
+
+{% block content %}
+<h1>Все статьи.</h1>
+<hr>
+    {% if newses %}
+        <table>
+            <tr>
+                <th>Название&nbsp;</th>
+                <th>&nbsp;Дата</th>
+                <th> Тип статьи </th>
+                <th>&nbsp;Краткое содердание&nbsp;</th>
+                <th>&nbsp;Автор&nbsp;</th>
+                <th>&nbsp;Рейтинг&nbsp;</th>
+            </tr>
+
+           <!-- Для каждого товара будете генерироваться новая строчка,
+           т.е. новый HTML код, который указан в теле цикла.
+           При этом сам цикл работает точно так же, как и в Python.
+           product — переменная цикла, т.е. наш товар полученный из списка -->
+            {% for news in newses|dictsortreversed:'date_creation' %}
+                {% if news.postType == 'AR'%}
+
+
+            <tr>
+                <!-- Добавим специальный фильтр truncatechars,
+                чтобы ограничить количество символов до 20.
+                Все остальные символы превратятся в многоточие. -->
+                <td><a href="{{ news.get_absolute_url }}">{{ news.title}}</a></td>
+                <td>{{ news.date_creation|date:'M d Y' }}</td>
+                <td>{{ news.postType }}</td>
+                <td>{{ news.text|truncatewords:20 }}</td>
+                <td>{{ news.postAuthor.authorUser.username }}</td>
+                <td>{{ news.rating }}</td>
+                <td><a href="{{ news.get_delete_url }}"><span style="color: #ff0000;">DELETE</span></a></td>
+                <td><p>&nbsp;</p></td>
+                <td><a href="{{ news.artikle_update }}">EDIT</a></td><td>
+            </tr>
+                {% endif %}
+            {% endfor %}
+
+        </table>
+    {% else %}
+       <h2>Новостей нет!</h2>
+    {% endif %}
+    {# Добавляем пагинацию на страницу #}
+
+        {% if page_obj.has_previous %}
+        {# Для каждой ссылки пагинации указываем обработку через новый тег #}
+            <a href="?{% url_replace page=1 %}">1</a>
+            {% if page_obj.previous_page_number != 1 %}
+               ...
+                <a href="?{% url_replace page=page_obj.previous_page_number %}">{{ page_obj.previous_page_number }}</a>
+            {% endif %}
+        {% endif %}
+
+        {{ page_obj.number }}
+
+        {% if page_obj.has_next %}
+            <a href="?{% url_replace page=page_obj.next_page_number %}">{{ page_obj.next_page_number }}</a>
+            {% if paginator.num_pages != page_obj.next_page_number %}
+               ...
+                <a href="?{% url_replace page=page_obj.paginator.num_pages %}">{{ page_obj.paginator.num_pages }}</a>
+            {% endif %}
+        {% endif %}
+
+    <p>&nbsp;</p>
+    <h3><a href="http://127.0.0.1:8000/article/create" target="_self">Добавить статью</a></h3>
+
+{% endblock content %}
