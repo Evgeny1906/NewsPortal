@@ -6,10 +6,29 @@
 
 
 {% block content %}
+{% if is_author %}
+    <p style="text-align: right;">Вы вошли как автор: {{ request.user.username }}</p>
+    <p style="text-align: right;"><a href="{% url 'logout' %}">LogOut</a> </p>
+{% elif is_authent and not is_author %}
+    <p style="text-align: right;">Вы вошли как пользователь: {{ request.user.username }}</p>
+    <p style="text-align: right;"><a href="{% url 'logout' %}">LogOut</a> </p>
+
+{% else %}
+    <p style="text-align: right;">
+    <a href="http://127.0.0.1:8000/accounts/login">LogIn</a>
+    </p>
+{% endif %}
 <h1>Все статьи.</h1>
+<p style="text-align: left;">Сегодня {{ time_now|date:'M d Y' }}</p>
+{% if not is_author and is_authent %}
+            <a href="{% url 'create_author' %}">
+                <p style="text-align: right;">Стать автором!</p>
+            </a>
+            {% endif %}
+
 <hr>
     {% if newses %}
-        <table>
+        <table style="width:100%">
             <tr>
                 <th>Название&nbsp;</th>
                 <th>&nbsp;Дата</th>
@@ -37,9 +56,13 @@
                 <td>{{ news.text|truncatewords:20 }}</td>
                 <td>{{ news.postAuthor.authorUser.username }}</td>
                 <td>{{ news.rating }}</td>
+                {% if news.postAuthor == request.user.author %}
                 <td><a href="{{ news.get_delete_url }}"><span style="color: #ff0000;">DELETE</span></a></td>
+                {% endif %}
                 <td><p>&nbsp;</p></td>
+                {% if news.postAuthor == request.user.author %}
                 <td><a href="{{ news.artikle_update }}">EDIT</a></td><td>
+                {% endif %}
             </tr>
                 {% endif %}
             {% endfor %}
@@ -70,6 +93,7 @@
         {% endif %}
 
     <p>&nbsp;</p>
+    {% if is_author %}
     <h3><a href="http://127.0.0.1:8000/article/create" target="_self">Добавить статью</a></h3>
-
+    {% endif %}
 {% endblock content %}

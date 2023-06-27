@@ -8,12 +8,33 @@ Newses
 {% endblock title %}
 
 {% block content %}
+{% if is_author %}
+    <p style="text-align: right;">Вы вошли как автор: {{ request.user.username }}</p>
+    <p style="text-align: right;"><a href="{% url 'logout' %}">LogOut</a> </p>
+{% elif is_authent and not is_author %}
+    <p style="text-align: right;">Вы вошли как пользователь: {{ request.user.username }}</p>
+    <p style="text-align: right;"><a href="{% url 'logout' %}">LogOut</a> </p>
+
+{% else %}
+    <p style="text-align: right;">
+    <a href="http://127.0.0.1:8000/accounts/login">LogIn</a>
+    </p>
+{% endif %}
+
+
     <p>&nbsp;</p>
    <form action="" method="get">
        {# Переменная, которую мы передали через контекст, может сгенерировать нам форму с полями #}
        {{ filterset.form.as_p }}
        {# Добавим кнопку отправки данных формы #}
        <input type="submit" value="Найти" />
+
+         <p style="text-align: left;">Сегодня {{ time_now|date:'M d Y' }}</p>
+            {% if not is_author and is_authent %}
+            <a href="{% url 'create_author' %}">
+                <p style="text-align: right;">Стать автором!</p>
+            </a>
+            {% endif %}
    </form>
 
      <hr>

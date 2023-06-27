@@ -4,12 +4,14 @@ from django.core.exceptions import ValidationError
 
 
 class PostForm(forms.ModelForm):
-    text = forms.TextInput()
+    # postAuthor = forms.ChoiceField()
     title = forms.CharField(max_length=150)
+    text = forms.TextInput()
 
     class Meta:
         model = Post
-        exclude = ['postType', 'rating']
+        fields = ['postCategory','title','text']
+        # exclude = ['postType', 'rating']
 
     def clean(self):
         cleaned_data = super().clean()

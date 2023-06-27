@@ -5,7 +5,7 @@ from datetime import datetime
 from .forms import PostForm
 from .filters import NewsFilter
 from django.urls import reverse_lazy
-from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 # Create your views here.
 
 
@@ -24,7 +24,8 @@ class NewsList(ListView):
         context = super().get_context_data(**kwargs)
         # К словарю добавим текущую дату в ключ 'time_now'.
         context['time_now'] = datetime.utcnow()
-        # context['filterset'] = self.filterset
+        context['is_author'] = self.request.user.groups.filter(name='Authors').exists()
+        context['is_authent'] = self.request.user.is_authenticated
         return context
 
 
@@ -35,11 +36,20 @@ class NewsDeta(DetailView):
     context_object_name = 'news'
 
 
-class NewsCreate(CreateView):
+class NewsCreate(PermissionRequiredMixin, CreateView):
+    permission_required = ('news.add_post')
+    raise_exception = True
     form_class = PostForm
     model = Post
     template_name = 'news_creating.html'
 
+    def form_valid(self, form):
+        """If the form is valid, firstly save with commit=False argument the associated model."""
+        self.object = form.save(commit=False)
+        self.object.postAuthor = self.request.user.author
+        self.object.save()
+        # возвращаем form_valid предка
+        return super().form_valid(form)
 
 
 
@@ -65,6 +75,10 @@ class NewsSearch(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['filterset'] = self.filterset
+        context['is_authent'] = self.request.user.is_authenticated
+        context['is_author'] = self.request.user.groups.filter(name='Authors').exists()
+        context['time_now'] = datetime.utcnow()
+
         return context
 
 
@@ -74,8 +88,16 @@ class ArticleList(ListView):
     template_name = 'article.html'
     context_object_name = 'newses'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['is_author'] = self.request.user.groups.filter(name='Authors').exists()
+        context['is_authent'] = self.request.user.is_authenticated
+        context['time_now'] = datetime.utcnow()
 
-class ArticleCreate(CreateView):
+        return context
+
+class ArticleCreate(PermissionRequiredMixin, CreateView):
+    permission_required = ('news.add_post')
     form_class = PostForm
     model = Post
     template_name = 'article_creating.html'
@@ -84,6 +106,7 @@ class ArticleCreate(CreateView):
         """If the form is valid, firstly save with commit=False argument the associated model."""
         self.object = form.save(commit=False)
         self.object.postType = 'AR'
+        self.object.postAuthor = self.request.user.author
         self.object.save()
         # возвращаем form_valid предка
         return super().form_valid(form)
@@ -93,20 +116,19 @@ class ArticleCreate(CreateView):
 
 
 # Представление удаляющее Post.
-class NewsDelete(DeleteView):
+class NewsDelete(PermissionRequiredMixin, DeleteView):
+    permission_required = ('news.delete_post')
     model = Post
     template_name = 'news_delete.html'
     success_url = reverse_lazy('news_search')
     context_object_name = 'news'
 
 
-class NewsUpdate(UpdateView):
+class NewsUpdate(PermissionRequiredMixin, UpdateView):
+    permission_required = ('news.change_post')
     model = Post
     template_name = 'news_update.html'
     form_class = PostForm
 
 
-# class ArticleUpdate(UpdateView):
-#     model = Post
-#     template_name = 'news_update.html'
-#     form_class = PostForm
+
