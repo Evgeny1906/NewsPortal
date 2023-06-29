@@ -1,5 +1,6 @@
 from django.urls import path
-from .views import NewsList, NewsDeta, NewsCreate, NewsSearch, ArticleList, ArticleCreate, NewsDelete, NewsUpdate
+from .views import (NewsList, NewsDeta, NewsCreate, NewsSearch, ArticleList,
+                    ArticleCreate, NewsDelete, NewsUpdate, subscriptions)
 
 urlpatterns = [
 # path — означает путь.
@@ -19,7 +20,7 @@ urlpatterns = [
 
    path('article/', ArticleList.as_view()),
    path('article/create', ArticleCreate.as_view()),
-   path('article/edit/<int:pk>', NewsUpdate.as_view(), name='artikle_edit')
-
+   path('article/edit/<int:pk>', NewsUpdate.as_view(), name='artikle_edit'),
+   path('subscriptions', subscriptions, name='subscription'),
 
 ]
