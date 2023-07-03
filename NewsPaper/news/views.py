@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.views.generic import ListView, DetailView, CreateView, DeleteView, UpdateView
 from .models import Post, Subscription, Category
 from datetime import datetime
@@ -164,3 +164,22 @@ def subscriptions(request):
         {'categories': categories_with_subscriptions},
     )
 
+
+class Category_List_View(ListView):
+    model = Post
+    template_name = 'news/category_news.html'
+    context_object_name = 'category_news'
+    # ordering = ['-date_creation']
+    paginate_by = 10
+    def get_queryset(self):
+        self.category = get_object_or_404(Category, id=self.kwargs['pk'])
+        quoryset = Post.objects.filter(postCategory=self.category).order_by('-date_creation')
+        return quoryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        subscrib = self.category.subscribers.filter(email=user.email)
+        context['is_not_subscriber'] = self.request.user not in self.category.subscribers.all()
+        context['category'] = self.category
+        return context
