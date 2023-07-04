@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import ListView, DetailView, CreateView, DeleteView, UpdateView
-from .models import Post, Subscription, Category
+from .models import Post, Category
 from datetime import datetime
 from .forms import PostForm
 from .filters import NewsFilter
@@ -72,7 +72,7 @@ class NewsSearch(ListView):
         # Сохраняем нашу фильтрацию в объекте класса,
         # чтобы потом добавить в контекст и использовать в шаблоне.
         self.filterset = NewsFilter(self.request.GET, queryset)
-        # Возвращаем из функции отфильтрованный список товаров
+        # Возвращаем из функции отфильтрованный список
         return self.filterset.qs
 
     def get_context_data(self, **kwargs):
@@ -81,7 +81,6 @@ class NewsSearch(ListView):
         context['is_authent'] = self.request.user.is_authenticated
         context['is_author'] = self.request.user.groups.filter(name='Authors').exists()
         context['time_now'] = datetime.utcnow()
-
         return context
 
 
@@ -134,35 +133,35 @@ class NewsUpdate(PermissionRequiredMixin, UpdateView):
     form_class = PostForm
 
 
-@login_required
-@csrf_protect
-def subscriptions(request):
-    if request.method == 'POST':
-        category_id = request.POST.get('category_id')
-        category = Category.objects.get(id=category_id)
-        action = request.POST.get('action')
+# @login_required
+# @csrf_protect
+# def subscriptions(request):
+#     if request.method == 'POST':
+#         category_id = request.POST.get('category_id')
+#         category = Category.objects.get(id=category_id)
+#         action = request.POST.get('action')
 
-        if action == 'subscribe':
-            Subscription.objects.create(user=request.user, category=category)
-        elif action == 'unsubscribe':
-            Subscription.objects.filter(
-                user=request.user,
-                category=category,
-            ).delete()
-
-    categories_with_subscriptions = Category.objects.annotate(
-        user_subscribed=Exists(
-            Subscription.objects.filter(
-                user=request.user,
-                category=OuterRef('pk'),
-            )
-        )
-    ).order_by('category')
-    return render(
-        request,
-        'subscriptions.html',
-        {'categories': categories_with_subscriptions},
-    )
+    #     if action == 'subscribe':
+    #         Subscription.objects.create(user=request.user, category=category)
+    #     elif action == 'unsubscribe':
+    #         Subscription.objects.filter(
+    #             user=request.user,
+    #             category=category,
+    #         ).delete()
+    #
+    # categories_with_subscriptions = Category.objects.annotate(
+    #     user_subscribed=Exists(
+    #         Subscription.objects.filter(
+    #             user=request.user,
+    #             category=OuterRef('pk'),
+    #         )
+    #     )
+    # ).order_by('category')
+    # return render(
+    #     request,
+    #     'subscriptions.html',
+    #     {'categories': categories_with_subscriptions},
+    # )
 
 
 class Category_List_View(ListView):

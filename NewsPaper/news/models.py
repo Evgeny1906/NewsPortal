@@ -22,7 +22,7 @@ class Author(models.Model):
 
 class Category(models.Model):
     category = models.CharField(max_length=64, unique=True)
-    subscribers = models.ManyToManyField(User, blank=True, null=True, related_name='categories')
+    subscribers = models.ManyToManyField(User, blank=True, related_name='categories')
     def __str__(self):
         return self.category
     def get_categories_url(self):
@@ -86,14 +86,3 @@ class Comment(models.Model):
         self.save()
 
 
-class Subscription(models.Model):
-    user = models.ForeignKey(
-        to=User,
-        on_delete=models.CASCADE,
-        related_name='subscriptions',
-    )
-    category = models.ForeignKey(
-        to='Category',
-        on_delete=models.CASCADE,
-        related_name='subscriptions',
-    )
