@@ -133,35 +133,8 @@ class NewsUpdate(PermissionRequiredMixin, UpdateView):
     form_class = PostForm
 
 
-# @login_required
-# @csrf_protect
-# def subscriptions(request):
-#     if request.method == 'POST':
-#         category_id = request.POST.get('category_id')
-#         category = Category.objects.get(id=category_id)
-#         action = request.POST.get('action')
 
-    #     if action == 'subscribe':
-    #         Subscription.objects.create(user=request.user, category=category)
-    #     elif action == 'unsubscribe':
-    #         Subscription.objects.filter(
-    #             user=request.user,
-    #             category=category,
-    #         ).delete()
-    #
-    # categories_with_subscriptions = Category.objects.annotate(
-    #     user_subscribed=Exists(
-    #         Subscription.objects.filter(
-    #             user=request.user,
-    #             category=OuterRef('pk'),
-    #         )
-    #     )
-    # ).order_by('category')
-    # return render(
-    #     request,
-    #     'subscriptions.html',
-    #     {'categories': categories_with_subscriptions},
-    # )
+
 
 
 class Category_List_View(ListView):
@@ -177,8 +150,19 @@ class Category_List_View(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        user = self.request.user
-        subscrib = self.category.subscribers.filter(email=user.email)
+        # user = self.request.user
+        # subscrib = self.category.subscribers.filter(email=user.email)
         context['is_not_subscriber'] = self.request.user not in self.category.subscribers.all()
         context['category'] = self.category
         return context
+
+
+@login_required
+@csrf_protect
+def subscribe(request, pk):
+    user = request.user
+    category = Category.objects.get(id=pk)
+    category.subscribers.add(user)
+    message = 'Вы успешно подписались на рассылку новостей в категории '
+
+    return render(request, 'news/subscriptions.html', {'category': category, 'message': message})

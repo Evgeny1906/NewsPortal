@@ -56,7 +56,7 @@ Newses
                     <td>{{ news.date_creation|date:'M d Y' }}</td>
                     <td>
                         {% for c in news.postCategory.all %}
-                        <a href="{{ get_categories_url }}">{{ c.category }}</a>
+                        <a href="{{ c.get_categories_url }}">{{ c.category }}</a>
 
                         {% endfor %}
                     </td>
