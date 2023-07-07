@@ -5,12 +5,9 @@
     <title>New Post</title>
 </head>
 <body>
-<h1>Новый пост в </h1>
-<p>
- категории
-<strong>{{ category.category }}</strong>
-
-
-</p>
+<p>Новый пост в вашей любимой категории: {{ category }}</p>
+<p>Автор {{post.postAuthor.authorUser.username }}</p>
+<strong><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></strong>
+<h3>{{ post.preview }}</h3>
 </body>
 </html>

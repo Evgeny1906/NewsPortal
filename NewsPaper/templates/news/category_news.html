@@ -23,7 +23,7 @@ Category News
     </p>
 {% endif %}
 
-<h1 xmlns="http://www.w3.org/1999/html">Все новости</h1>
+<h1 xmlns="http://www.w3.org/1999/html">Все новости в категории: {{ category }}</h1>
     <!-- Используем переданную из представления переменную time_now
    и применяем к ней фильтр date. По назначению этот фильтр очень похож
    на метод strftime у объекта datetime в Python — вывод времени
@@ -33,6 +33,8 @@ Category News
    то выведется указанный в фильтре текст -->
 {% if is_not_subscriber %}
 <p class="text-center"><a href="{% url 'subscribe' category.id %}" class="btn btn-secondary btn-sm">Подписаться</a></p>
+{% else %}
+<p class="text-center"><a href="{% url 'unsubscribe' category.id %}" class="btn btn-secondary btn-sm">Oтписаться</a></p>
 {% endif %}
    <hr>
     {% if category_news %}

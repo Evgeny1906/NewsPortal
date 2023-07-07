@@ -14,10 +14,9 @@ def new_post_subckription(instance):
         email_subject = f'New Post in category {category}'
 
         user_email = get_subscriber(category)
-        print(user_email)
         html = render_to_string(
         template_name = template,
-            context={'category': category, 'post': instance}
+            context={'category': category, 'post': instance},
 
 
         )

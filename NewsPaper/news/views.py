@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView, DetailView, CreateView, DeleteView, UpdateView
 from .models import Post, Category
 from datetime import datetime
@@ -166,3 +166,11 @@ def subscribe(request, pk):
     message = 'Вы успешно подписались на рассылку новостей в категории '
 
     return render(request, 'news/subscriptions.html', {'category': category, 'message': message})
+
+@login_required
+def unsubscribe(request, pk):
+    user = request.user
+    category = Category.objects.get(id=pk)
+    if category.subscribers.filter(id=user.id).exists():
+        category.subscribers.remove(user)
+    return redirect('news_search')
