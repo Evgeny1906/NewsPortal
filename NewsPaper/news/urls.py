@@ -2,6 +2,7 @@ from django.urls import path
 from .views import (NewsList, NewsDeta, NewsCreate, NewsSearch, ArticleList,
                     ArticleCreate, NewsDelete, NewsUpdate, Category_List_View, subscribe, unsubscribe)
 
+
 urlpatterns = [
 
    # Т.к. наше объявленное представление является классом,
@@ -22,4 +23,5 @@ urlpatterns = [
    path('categories/<int:pk>/subscribe', subscribe, name='subscribe'),
    path('categories/<int:pk>', Category_List_View.as_view(), name='category_list'),
    path('categories/<int:pk>/unsubscribe', unsubscribe, name='unsubscribe'),
+   # path('', IndexView.as_view())
 ]

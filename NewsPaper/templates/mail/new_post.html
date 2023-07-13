@@ -5,9 +5,8 @@
     <title>New Post</title>
 </head>
 <body>
-<p>Новый пост в вашей любимой категории: {{ category }}</p>
-<p>Автор {{post.postAuthor.authorUser.username }}</p>
-<strong><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></strong>
-<h3>{{ post.preview }}</h3>
+<p>Новый пост в вашей любимой категории: {{ link }}</p>
+<p>{{ text }}</p>
+
 </body>
 </html>

@@ -1,4 +1,6 @@
+from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
+from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, DeleteView, UpdateView
 from .models import Post, Category
 from datetime import datetime
@@ -7,7 +9,7 @@ from .filters import NewsFilter
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.auth.decorators import login_required
-from django.db.models import Exists, OuterRef
+from .tasks import send_msg_every_wick, send_msg
 from django.views.decorators.csrf import csrf_protect
 # Create your views here.
 
@@ -51,8 +53,10 @@ class NewsCreate(PermissionRequiredMixin, CreateView):
         self.object = form.save(commit=False)
         self.object.postAuthor = self.request.user.author
         self.object.save()
+        # send_msg.delay()
         # возвращаем form_valid предка
         return super().form_valid(form)
+
 
 
 
@@ -174,3 +178,9 @@ def unsubscribe(request, pk):
     if category.subscribers.filter(id=user.id).exists():
         category.subscribers.remove(user)
     return redirect('news_search')
+
+
+# class IndexView(View):
+#     def get(self, request):
+#         send_msg_every_wick.delay()
+#         return HttpResponse('Hello!')
